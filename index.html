@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marketing Research Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: header + deadline strip, then a week-grid Gantt (Sep 27 – Dec 5), then a stage-by-stage list */
+:root{
+  --bg:#f6f7fa; --surface:#ffffff; --fg:#1b2030; --muted:#5d6478; --line:#dfe2ea; --weekend:#eef0f5;
+  --accent:#d6455d; --today:#2a5bd7;
+  --p1:#8b6fe0; --p2:#3b8fd9; --p3:#3aa66b; --p4:#d9a21b; --p5:#e07a3a; --p6:#d6455d;
+  --p1-bg:#ece6fc; --p2-bg:#e0eefb; --p3-bg:#e1f3e8; --p4-bg:#fbf0d6; --p5-bg:#fbe7da; --p6-bg:#fae0e4;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151d; --surface:#1a1e29; --fg:#e7e9f0; --muted:#9aa1b4; --line:#2c3242; --weekend:#161a24;
+  --accent:#f07085; --today:#6f9bff;
+  --p1:#a990f5; --p2:#62a9ec; --p3:#5cc48a; --p4:#e8b840; --p5:#f09658; --p6:#f07085;
+  --p1-bg:#2a2445; --p2-bg:#1c2d42; --p3-bg:#1b3327; --p4-bg:#3a3018; --p5-bg:#3d2a1c; --p6-bg:#3e2128;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151d; --surface:#1a1e29; --fg:#e7e9f0; --muted:#9aa1b4; --line:#2c3242; --weekend:#161a24;
+  --accent:#f07085; --today:#6f9bff;
+  --p1:#a990f5; --p2:#62a9ec; --p3:#5cc48a; --p4:#e8b840; --p5:#f09658; --p6:#f07085;
+  --p1-bg:#2a2445; --p2-bg:#1c2d42; --p3-bg:#1b3327; --p4-bg:#3a3018; --p5-bg:#3d2a1c; --p6-bg:#3e2128;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:40px 64px;display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(28px,5vw,44px);font-weight:700;line-height:1.1}
+h2{font-size:20px;font-weight:700}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:10px}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.next{display:inline-flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin-top:6px;font-size:14px}
+.next strong{font-family:var(--f-display);font-size:18px}
+.next .count{font-family:var(--f-mono);color:var(--accent);font-weight:500}
+
+/* Deadlines */
+.deadlines{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dl{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.dl .date{font-family:var(--f-mono);font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
+.dl .name{font-weight:600;line-height:1.3}
+.dl .rel{font-size:13px;color:var(--muted)}
+.dl.done{opacity:.55}
+.dl.upcoming{border-color:var(--accent)}
+@media (max-width:760px){.deadlines{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Gantt */
+section{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.sec-head .note{font-size:13px;color:var(--muted)}
+.gantt-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.gantt{--day:13px;--label:200px;position:relative;width:calc(var(--label) + var(--days) * var(--day));min-width:100%;font-size:13px}
+.g-row{display:grid;grid-template-columns:var(--label) 1fr;align-items:center;min-height:40px;border-top:1px solid var(--line)}
+.g-row:first-child{border-top:0}
+.g-label{padding:8px 14px;font-weight:500;display:flex;gap:8px;align-items:center;position:sticky;left:0;background:var(--surface);z-index:5;height:100%;border-right:1px solid var(--line)}
+.g-label .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);width:1.2em}
+.g-track{position:relative;height:40px}
+.g-head .g-track{height:46px}
+.month{position:absolute;top:6px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg);font-weight:500;padding-left:4px}
+.wk{position:absolute;bottom:6px;font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-left:4px;font-variant-numeric:tabular-nums}
+.gridlines{position:absolute;inset:0 0 0 var(--label);pointer-events:none;z-index:0}
+.gridlines i{position:absolute;top:0;bottom:0;border-left:1px solid var(--line)}
+.gridlines b{position:absolute;top:0;bottom:0;background:var(--weekend)}
+.bar{position:absolute;top:9px;height:22px;border-radius:5px;z-index:1;display:flex;align-items:center;padding-inline:8px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;font-family:var(--f-mono)}
+.ms{position:absolute;top:50%;width:12px;height:12px;transform:translate(-50%,-50%) rotate(45deg);background:var(--accent);z-index:1;border-radius:2px}
+.ms-line{position:absolute;top:0;bottom:0;border-left:1.5px dashed var(--accent);opacity:.45;z-index:1}
+.today-line{position:absolute;top:0;bottom:0;border-left:2px solid var(--today);z-index:3}
+.today-line span{position:absolute;top:2px;left:4px;font-family:var(--f-mono);font-size:10px;color:var(--today);text-transform:uppercase;letter-spacing:.06em;background:var(--surface);padding:0 3px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend .k-ms{width:10px;height:10px;background:var(--accent);transform:rotate(45deg);border-radius:2px}
+.legend .k-today{width:2px;height:14px;background:var(--today)}
+
+/* Stages */
+.stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;list-style:none;padding:0;margin:0}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chip{font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:500;letter-spacing:.04em}
+.stage h3{margin:0;font-size:16px;font-family:var(--f-body);font-weight:600}
+.stage .dates{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stage p{margin:0;font-size:14px;color:var(--muted)}
+.status{font-size:12px;font-weight:600;font-family:var(--f-mono)}
+.status.now{color:var(--today)}
+.status.later{color:var(--muted)}
+.status.done{color:var(--p3)}
+
+/* Edit mode */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
+.btn{font:inherit;font-size:14px;font-weight:600;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn:focus-visible,.field:focus-visible,.x:focus-visible{outline:2px solid var(--today);outline-offset:2px}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.small{font-size:13px;padding:6px 10px;font-weight:500}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:13px;color:var(--muted)}
+.save-state.dirty{color:var(--accent)}
+.field{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+textarea.field{resize:vertical;min-height:56px;line-height:1.45}
+input[type=date].field{font-family:var(--f-mono);font-size:13px}
+.date-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.date-pair label,.dl label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:0}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;font-family:var(--f-mono)}
+.x:hover{color:var(--accent)}
+.add{border:1.5px dashed var(--line);background:none;border-radius:10px;color:var(--muted);font:inherit;font-weight:600;cursor:pointer;padding:14px;min-height:60px}
+.add:hover{color:var(--fg);border-color:var(--muted)}
+.warn{font-size:13px;color:var(--accent)}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:560px){.gantt{--label:150px;--day:13px}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Group project · Fall 2026</div>
+    <h1>Marketing Research Timeline</h1>
+    <p>Six stages from research question to final presentation. Course deadlines are fixed; stage windows are the proposed plan and run about 1–1.5 weeks each, with analysis and presentation prep allowed up to 2 weeks.</p>
+    <div class="next" id="next"></div>
+    <div class="toolbar">
+      <button class="btn" id="editBtn" type="button">Edit timeline</button>
+      <button class="btn primary" id="saveBtn" type="button" hidden>Save changes</button>
+      <button class="btn" id="cancelBtn" type="button" hidden>Cancel</button>
+      <span class="save-state" id="saveState"></span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><h2>Due dates</h2></div>
+    <div class="deadlines" id="deadlines"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Schedule</h2>
+      <div class="legend">
+        <span><i class="k-ms"></i>Course deadline</span>
+        <span><i class="k-today"></i>Today</span>
+      </div>
+    </div>
+    <div class="gantt-scroll"><div class="gantt" id="gantt"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Stages</h2><span class="note" id="stagesNote">Proposed by Pam</span></div>
+    <ol class="stages" id="stages"></ol>
+  </section>
+
+  <footer>Stage windows are proposed and may shift with instructor feedback. Use <strong>Edit timeline</strong> to change dates, rename stages, or add new ones; saved changes are shared with everyone who has the link.</footer>
+</div>
+
+<script>
+const DEFAULT_PLAN = {
+  deadlines: [
+    {date:"2026-10-02", name:"Research Question Brief"},
+    {date:"2026-10-07", name:"Research Design Proposal + Survey Draft"},
+    {date:"2026-11-25", name:"Group Project Preliminary Analysis"},
+    {date:"2026-12-02", name:"Final Presentation"},
+  ],
+  stages: [
+    {name:"Research design refinement",start:"2026-10-11",end:"2026-10-17",note:"Revise the design and survey based on feedback from the 10/07 proposal."},
+    {name:"Gather ad examples",start:"2026-10-14",end:"2026-10-20",note:"Collect the advertisement examples participants will see in the experiment."},
+    {name:"Find / gather sample",start:"2026-10-21",end:"2026-10-27",note:"Recruit participants and confirm the sample for the survey."},
+    {name:"Experiment / survey period",start:"2026-10-28",end:"2026-11-07",note:"Run the experiment and keep the survey open for responses."},
+    {name:"Analysis",start:"2026-11-08",end:"2026-11-21",note:"Clean and analyze results. Feeds the preliminary analysis due 11/25."},
+    {name:"Presentation prep",start:"2026-11-22",end:"2026-11-28",note:"Build and rehearse the final presentation for 12/02."},
+  ],
+};
+const MS = 864e5;
+const D = s => new Date(s + "T00:00:00");
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const valid = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(D(s));
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const today = new Date(); today.setHours(0,0,0,0);
+const fmt = (d,o={month:"short",day:"numeric"}) => valid(d) ? D(d).toLocaleDateString("en-US",o) : "—";
+const md = d => `${D(d).getMonth()+1}/${D(d).getDate()}`;
+const LONG = {weekday:"short",month:"short",day:"numeric"};
+const dayDiff = d => Math.round((D(d) - today) / MS);
+const rel = n => n === 0 ? "Due today" : n === 1 ? "Tomorrow" : n > 0 ? `In ${n} days` : n === -1 ? "Yesterday" : `${-n} days ago`;
+const color = i => (i % 6) + 1;
+
+let plan = clone(DEFAULT_PLAN);   // what's saved / shared
+let draft = null;                 // working copy while editing
+
+function sanitize(p){
+  const dl = Array.isArray(p?.deadlines) ? p.deadlines.filter(d => d && valid(d.date)).map(d => ({date:d.date, name:String(d.name||"Untitled deadline").slice(0,120)})) : [];
+  const st = Array.isArray(p?.stages) ? p.stages.filter(s => s && valid(s.start) && valid(s.end)).map(s => ({name:String(s.name||"Untitled stage").slice(0,120), start:s.start, end:s.end, note:String(s.note||"").slice(0,400)})) : [];
+  return {deadlines:dl, stages:st};
+}
+const sorted = p => ({deadlines:[...p.deadlines].sort((a,b)=>a.date.localeCompare(b.date)), stages:p.stages});
+
+function render(){
+  const editing = !!draft;
+  const p = editing ? draft : sorted(plan);
+  const okDl = p.deadlines.filter(d => valid(d.date));
+  const okSt = p.stages.filter(s => valid(s.start) && valid(s.end));
+
+  // Next deadline
+  const byDate = [...okDl].sort((a,b)=>a.date.localeCompare(b.date));
+  const nxt = byDate.find(d => dayDiff(d.date) >= 0);
+  document.getElementById("next").innerHTML = nxt
+    ? `<span class="eyebrow">Next due</span><strong>${esc(nxt.name)}</strong><span class="count">${fmt(nxt.date,LONG)} · ${rel(dayDiff(nxt.date))}</span>`
+    : (byDate.length ? `<strong>All deliverables submitted</strong>` : "");
+
+  // Deadline cards
+  document.getElementById("deadlines").innerHTML = editing
+    ? p.deadlines.map((d,i) => `<div class="dl">
+        <div class="stage-top"><label for="dl-date-${i}">Due date</label><button class="x" type="button" data-act="rm-dl" data-i="${i}" aria-label="Remove deadline">Remove</button></div>
+        <input class="field" type="date" id="dl-date-${i}" data-k="deadlines.${i}.date" value="${esc(d.date)}">
+        <input class="field" type="text" id="dl-name-${i}" data-k="deadlines.${i}.name" value="${esc(d.name)}" aria-label="Deadline name" placeholder="Deliverable name">
+      </div>`).join("") + `<button class="add" type="button" data-act="add-dl">+ Add deadline</button>`
+    : byDate.map(d => {
+        const n = dayDiff(d.date);
+        const cls = n < 0 ? "done" : (d === nxt ? "upcoming" : "");
+        return `<div class="dl ${cls}"><span class="date">${fmt(d.date,LONG)}</span><span class="name">${esc(d.name)}</span><span class="rel">${rel(n)}</span></div>`;
+      }).join("");
+
+  renderGantt(okDl, p.stages);
+
+  // Stage cards
+  document.getElementById("stages").innerHTML = editing
+    ? p.stages.map((s,i) => {
+        const bad = valid(s.start) && valid(s.end) && s.end < s.start;
+        return `<li class="stage">
+        <div class="stage-top"><span class="chip" style="background:var(--p${color(i)}-bg);color:var(--p${color(i)})">Stage ${i+1}</span>
+          <span><button class="x" type="button" data-act="up" data-i="${i}" aria-label="Move earlier" ${i===0?"disabled":""}>↑</button><button class="x" type="button" data-act="down" data-i="${i}" aria-label="Move later" ${i===p.stages.length-1?"disabled":""}>↓</button><button class="x" type="button" data-act="rm-st" data-i="${i}">Remove</button></span></div>
+        <input class="field" type="text" id="st-name-${i}" data-k="stages.${i}.name" value="${esc(s.name)}" aria-label="Stage name" placeholder="Stage name">
+        <div class="date-pair">
+          <label for="st-start-${i}">Start<input class="field" type="date" id="st-start-${i}" data-k="stages.${i}.start" value="${esc(s.start)}"></label>
+          <label for="st-end-${i}">End<input class="field" type="date" id="st-end-${i}" data-k="stages.${i}.end" value="${esc(s.end)}"></label>
+        </div>
+        ${bad ? `<span class="warn">End date is before the start date.</span>` : ""}
+        <textarea class="field" id="st-note-${i}" data-k="stages.${i}.note" aria-label="Stage notes" placeholder="What happens in this stage">${esc(s.note)}</textarea>
+      </li>`}).join("") + `<li><button class="add" type="button" data-act="add-st" style="width:100%;height:100%">+ Add stage</button></li>`
+    : okSt.map((s,i) => {
+        const a = dayDiff(s.start), b = dayDiff(s.end);
+        const st = b < 0 ? ["done","Done"] : a <= 0 ? ["now","In progress"] : ["later", `Starts ${rel(a).toLowerCase()}`];
+        const days = Math.round((D(s.end)-D(s.start))/MS)+1;
+        const len = days < 7 ? `${days} day${days===1?"":"s"}` : `${(days/7).toFixed(1).replace(".0","")} wk`;
+        return `<li class="stage"><div class="stage-top"><span class="chip" style="background:var(--p${color(i)}-bg);color:var(--p${color(i)})">Stage ${i+1}</span><span class="status ${st[0]}">${st[1]}</span></div>
+          <h3>${esc(s.name)}</h3><span class="dates">${fmt(s.start,LONG)} → ${fmt(s.end,LONG)} · ${len}</span>${s.note?`<p>${esc(s.note)}</p>`:""}</li>`;
+      }).join("");
+
+  document.getElementById("editBtn").hidden = editing;
+  document.getElementById("saveBtn").hidden = !editing;
+  document.getElementById("cancelBtn").hidden = !editing;
+  document.getElementById("stagesNote").hidden = editing;
+}
+
+function renderGantt(deadlines, stagesAll){
+  const g = document.getElementById("gantt");
+  const stages = stagesAll.map((s,i)=>({...s,i})).filter(s => valid(s.start) && valid(s.end));
+  const dates = [...deadlines.map(d=>d.date), ...stages.flatMap(s=>[s.start,s.end])].map(D);
+  if (!dates.length){ g.innerHTML = `<div style="padding:24px;color:var(--muted)">Add a deadline or stage to see the schedule.</div>`; return; }
+  const min = new Date(Math.min(...dates, today)), max = new Date(Math.max(...dates));
+  const START = new Date(min); START.setDate(START.getDate() - START.getDay());
+  const END = new Date(max); END.setDate(END.getDate() + (6 - END.getDay()));
+  const DAYS = Math.round((END - START)/MS) + 1;
+  g.style.setProperty("--days", DAYS);
+  const off = d => Math.round((D(d) - START) / MS);
+  const pos = o => `calc(${o} * var(--day))`;
+  let grid = "", head = "";
+  for (let i = 0; i < DAYS; i++) {
+    const dt = new Date(START.getFullYear(), START.getMonth(), START.getDate() + i);
+    if (dt.getDay() === 0 || dt.getDay() === 6) grid += `<b style="left:${pos(i)};width:var(--day)"></b>`;
+    if (dt.getDay() === 0) { grid += `<i style="left:${pos(i)}"></i>`; head += `<span class="wk" style="left:${pos(i)}">${dt.getMonth()+1}/${dt.getDate()}</span>`; }
+    if (dt.getDate() === 1 || (i === 0 && dt.getDate() <= 24)) head += `<span class="month" style="left:${pos(i)}">${dt.toLocaleDateString("en-US",{month:"long"})}</span>`;
+  }
+  let rows = `<div class="g-row g-head"><div class="g-label"><span class="eyebrow">Stage</span></div><div class="g-track">${head}</div></div>`;
+  rows += `<div class="g-row"><div class="g-label"><span class="n">◆</span>Course deadlines</div><div class="g-track">${
+    deadlines.map(d => `<span class="ms" title="${esc(d.name)} · ${fmt(d.date)}" style="left:${pos(off(d.date)+.5)}"></span>`).join("")}</div></div>`;
+  rows += stages.map((s,k) => {
+    const a = off(s.start), len = Math.max(1, off(s.end) - a + 1), c = color(s.i);
+    return `<div class="g-row"><div class="g-label"><span class="n">${s.i+1}</span>${esc(s.name)}</div><div class="g-track">
+      <span class="bar" title="${esc(s.name)}: ${fmt(s.start)} – ${fmt(s.end)}" style="left:${pos(a)};width:${pos(len)};background:var(--p${c}-bg);color:var(--p${c});box-shadow:inset 0 0 0 1.5px var(--p${c})">${md(s.start)}–${md(s.end)}</span></div></div>`;
+  }).join("");
+  const overlays = deadlines.map(d => `<span class="ms-line" style="left:calc(var(--label) + ${off(d.date)+.5} * var(--day))"></span>`).join("");
+  const tOff = Math.round((today - START)/MS);
+  const todayLine = (tOff >= 0 && tOff < DAYS) ? `<span class="today-line" style="left:calc(var(--label) + ${tOff+.5} * var(--day))"><span>Today</span></span>` : "";
+  g.innerHTML = `<div class="gridlines">${grid}</div>${rows}${overlays}${todayLine}`;
+}
+
+// ---- Editing ----
+const stateEl = document.getElementById("saveState");
+const setState = (t, cls="") => { stateEl.textContent = t; stateEl.className = "save-state " + cls; };
+let rerenderTimer = null;
+
+document.addEventListener("input", e => {
+  const k = e.target.dataset?.k; if (!k || !draft) return;
+  const [list, i, field] = k.split(".");
+  draft[list][+i][field] = e.target.value;
+  setState("Unsaved changes", "dirty");
+  // Dates change the chart right away; text updates the chart after a pause
+  clearTimeout(rerenderTimer);
+  if (e.target.type === "date") { const id = e.target.id; render(); document.getElementById(id)?.focus(); }
+  else rerenderTimer = setTimeout(() => renderGantt(draft.deadlines.filter(d=>valid(d.date)), draft.stages), 300);
+});
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if (!b || !draft) return;
+  const i = +b.dataset.i;
+  const act = b.dataset.act;
+  if (act === "rm-dl") draft.deadlines.splice(i,1);
+  if (act === "rm-st") draft.stages.splice(i,1);
+  if (act === "add-dl") draft.deadlines.push({date: iso(today), name:"New deadline"});
+  if (act === "add-st") {
+    const last = draft.stages[draft.stages.length-1];
+    const s = last && valid(last.end) ? (d => new Date(d.getFullYear(), d.getMonth(), d.getDate()+1))(D(last.end)) : new Date(today);
+    const e2 = new Date(s.getFullYear(), s.getMonth(), s.getDate()+6);
+    draft.stages.push({name:"New stage", start:iso(s), end:iso(e2), note:""});
+  }
+  if (act === "up" && i > 0) [draft.stages[i-1], draft.stages[i]] = [draft.stages[i], draft.stages[i-1]];
+  if (act === "down" && i < draft.stages.length-1) [draft.stages[i+1], draft.stages[i]] = [draft.stages[i], draft.stages[i+1]];
+  setState("Unsaved changes", "dirty");
+  render();
+});
+
+// ---- Shared store: Google Sheet via Apps Script web app ----
+// Paste your Apps Script "Web app URL" between the quotes (see SETUP.md).
+const SHEET_API = "https://script.google.com/macros/s/AKfycbz7-eMSCPGaqF48dbYK68JTYeb7QUzTJAbPYf0RRiZ-Vgbj_T06VN0ZcgINTWxJlN3I/exec";
+
+let version = null;   // version of the plan this view last loaded
+
+async function loadPlan(){
+  if (!SHEET_API) return;
+  try {
+    const r = await fetch(SHEET_API + "?action=get&t=" + Date.now());
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || "load failed");
+    version = j.version;
+    const p = sanitize(j.plan);
+    if (j.empty) return;           // sheet is new: keep the built-in plan until someone saves
+    plan = p;
+    if (!draft) { render(); setState(`Last saved ${new Date(j.updatedAt).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}`); }
+  } catch (_) {
+    if (!draft) setState("Couldn't load the shared timeline. Showing the last version this page knows.", "dirty");
+  }
+}
+
+document.getElementById("editBtn").onclick = () => {
+  draft = clone(sorted(plan));
+  setState(SHEET_API ? "" : "Saving isn't set up yet. Changes will last only until you reload.", SHEET_API ? "" : "dirty");
+  render();
+};
+document.getElementById("cancelBtn").onclick = () => { draft = null; setState(""); render(); loadPlan(); };
+document.getElementById("saveBtn").onclick = async () => {
+  const bad = draft.stages.find(s => valid(s.start) && valid(s.end) && s.end < s.start);
+  if (bad) { setState(`"${bad.name}" ends before it starts. Fix the dates, then save.`, "dirty"); return; }
+  const next = sanitize(draft);
+  if (!SHEET_API) { plan = next; draft = null; render(); setState("Applied to this view only (saving isn't set up)."); return; }
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true; setState("Saving…");
+  try {
+    // text/plain keeps this a "simple" request, which Apps Script accepts from any site
+    const r = await fetch(SHEET_API, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({action:"save", baseVersion: version, plan: next})});
+    const j = await r.json();
+    if (j.conflict) {
+      version = j.version;   // a second Save now replaces their version
+      setState("A teammate saved a newer version while you were editing. Click Save again to replace it with yours, or Cancel to see theirs.", "dirty");
+      return;
+    }
+    if (!j.ok) throw new Error(j.error);
+    version = j.version; plan = next; draft = null; render();
+    setState("Saved. Everyone with the link sees the update.");
+  } catch (_) {
+    setState("Couldn't save right now. Your edits are still here; try Save again.", "dirty");
+  } finally { btn.disabled = false; }
+};
+
+render();
+loadPlan();
+// Pick up teammates' changes: every minute, and when you come back to the tab
+setInterval(() => { if (!draft && !document.hidden) loadPlan(); }, 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !draft) loadPlan(); });
+</script>
+</body>
+</html>
